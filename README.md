@@ -62,6 +62,12 @@ What the app emits:
 - **Traces**: each request gets a server span (for example `GET /api/orders/{order_id}`). Each order lookup gets a child `order.lookup` span with `order.id`, `order.found`, and `order.priority`.
 - **Logs**: `Order lookup succeeded` (INFO), `Order not found` (WARN), and `Order lookup failed` (ERROR, with the exception). Each log carries `trace_id`/`span_id`. In Grafana, a log's TraceID link opens its trace, and a span's "Logs for this span" button opens its logs.
 
+### Alerts
+
+`observability/grafana/provisioning/alerting/order-tracker-alerts.yaml` provisions **Order Tracker 5xx server errors** (folder *Order Tracker*). Every 30s it computes 5xx responses per endpoint over the last 5 minutes and fires as soon as one endpoint has any. Each alert includes the endpoint, the 5-minute window, and a dashboard link. Endpoints that served traffic without errors report 0 (Normal), and no traffic at all is treated as OK, so quiet periods never show "No Data".
+
+Check its state under **Alerting → Alert rules** in Grafana. No contact point is configured yet, so firing alerts are visible in Grafana but not delivered anywhere.
+
 OTLP export is on when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. Set `ORDER_TRACKER_CONSOLE_TELEMETRY=true` in `compose.yaml` to also print all signals to `docker compose logs app`. The tests turn both off.
 
 The app uses SQLite to keep setup small. Run one app container at a time. The course exercise is about detecting and handling an incident, not scaling the database.

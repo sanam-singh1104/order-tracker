@@ -1,0 +1,68 @@
+# Grafana-managed alert rules, provisioned at startup.
+# Grafana does not expand env vars in alerting files, so dashboard_url assumes
+# the default port. Notifications also get dashboard/panel links built from
+# GF_SERVER_ROOT_URL via __dashboardUid__ and __panelId__.
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: order-tracker-errors
+    folder: Order Tracker
+    interval: 30s
+    rules:
+      - uid: order-tracker-5xx
+        title: Order Tracker 5xx server errors
+        condition: C
+        data:
+          # One series per endpoint: 5xx responses in the last 5 minutes.
+          # The `or ... * 0` part returns 0 for endpoints that served traffic
+          # without 5xx errors, so those stay Normal instead of disappearing.
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus
+            model:
+              refId: A
+              expr: >-
+                sum by (http_route) (increase(order_tracker_http_requests_total{http_route!="/healthz", http_response_status_code=~"5.."}[5m]))
+                or
+                sum by (http_route) (increase(order_tracker_http_requests_total{http_route!="/healthz"}[5m])) * 0
+              instant: true
+              range: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+        # No traffic at all means no errors, not a problem.
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          severity: critical
+          service: order-tracker
+        annotations:
+          summary: "HTTP 5xx errors on {{ $labels.http_route }}"
+          description: >-
+            {{ printf "%.0f" $values.B.Value }} server error(s) (HTTP 5xx) on
+            {{ $labels.http_route }} in the last 5 minutes.
+          endpoint: "{{ $labels.http_route }}"
+          window: 5m
+          dashboard_url: "http://127.0.0.1:3000/d/order-tracker/order-tracker?from=now-1h&to=now"
+          __dashboardUid__: order-tracker
+          __panelId__: "6"
