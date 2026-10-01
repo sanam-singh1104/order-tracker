@@ -35,12 +35,33 @@ Run tests with `uv run --frozen pytest -q`. Stop the app with `docker compose do
 
 ## Telemetry
 
-The app uses the OpenTelemetry SDK (`app/telemetry.py`) and writes all signals to stdout as JSON. View them with `docker compose logs -f app`.
+The app uses the OpenTelemetry SDK (`app/telemetry.py`) and sends OTLP to an OpenTelemetry Collector. The Collector forwards each signal to its own backend, and Grafana shows all three:
 
-- **Metrics** are printed every 10s (`OTEL_METRIC_EXPORT_INTERVAL`). `order_tracker.http.requests` (counter) and `http.server.request.duration` (histogram, seconds) both carry the attributes `http.route`, `http.response.status_code`, and `http.request.method`.
-- **Traces**: each request gets a `GET /api/orders/{order_id}` server span. Each order lookup gets a child `order.lookup` span with `order.id`, `order.found`, and `order.priority`.
-- **Logs**: `Order lookup succeeded` (INFO), `Order not found` (WARN), and `Order lookup failed` (ERROR, with the exception). Each log includes `trace_id`/`span_id` so you can match it to its span.
+```
+app --OTLP--> otel-collector --> Prometheus (metrics)
+                             --> Loki       (logs)
+                             --> Tempo      (traces)   --> Grafana
+```
 
-Set `ORDER_TRACKER_CONSOLE_TELEMETRY=false` to turn the exporters off; the tests do this.
+`docker compose up --build -d --wait` starts the whole stack. All config is under `observability/`:
+
+| File | Purpose |
+| --- | --- |
+| `otel-collector.yaml` | OTLP receiver, pipelines to Prometheus, Loki, and Tempo |
+| `prometheus.yml` | Prometheus settings; metrics arrive via its OTLP receiver |
+| `loki.yaml` | Single-process Loki with filesystem storage |
+| `tempo.yaml` | Single-binary Tempo with local storage |
+| `grafana/provisioning/` | Datasources (with trace/log links) and dashboard provider |
+| `grafana/dashboards/order-tracker.json` | The Order Tracker dashboard |
+
+Open Grafana at <http://127.0.0.1:3000> (set `GRAFANA_PORT` to change it). Anyone can view dashboards and use Explore without logging in. Sign in as `admin` / `admin` (or `GRAFANA_ADMIN_PASSWORD`) to edit. Prometheus is at <http://127.0.0.1:9090> (`PROMETHEUS_PORT`).
+
+What the app emits:
+
+- **Metrics** (every 10s, `OTEL_METRIC_EXPORT_INTERVAL`): `order_tracker.http.requests` (counter) and `http.server.request.duration` (histogram, seconds), both with `http.route`, `http.response.status_code`, and `http.request.method`. In Prometheus they are `order_tracker_http_requests_total` and `http_server_request_duration_seconds_*`, with labels `http_route`, `http_response_status_code`, and `http_request_method`.
+- **Traces**: each request gets a server span (for example `GET /api/orders/{order_id}`). Each order lookup gets a child `order.lookup` span with `order.id`, `order.found`, and `order.priority`.
+- **Logs**: `Order lookup succeeded` (INFO), `Order not found` (WARN), and `Order lookup failed` (ERROR, with the exception). Each log carries `trace_id`/`span_id`. In Grafana, a log's TraceID link opens its trace, and a span's "Logs for this span" button opens its logs.
+
+OTLP export is on when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. Set `ORDER_TRACKER_CONSOLE_TELEMETRY=true` in `compose.yaml` to also print all signals to `docker compose logs app`. The tests turn both off.
 
 The app uses SQLite to keep setup small. Run one app container at a time. The course exercise is about detecting and handling an incident, not scaling the database.
