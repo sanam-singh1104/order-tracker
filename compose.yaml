@@ -8,6 +8,10 @@ services:
       - "127.0.0.1:${ORDER_TRACKER_PORT:-8000}:8000"
     environment:
       ORDER_DB_PATH: /data/orders.db
+      PYTHONUNBUFFERED: "1"
+      OTEL_SERVICE_NAME: order-tracker
+      # Print metrics every 10s instead of the 60s default.
+      OTEL_METRIC_EXPORT_INTERVAL: "10000"
     volumes:
       - orders:/data
     restart: unless-stopped
