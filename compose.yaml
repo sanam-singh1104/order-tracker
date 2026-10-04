@@ -91,9 +91,12 @@ services:
       # Set to "false" to only collect context, without running Claude Code.
       AGENT_ENABLED: ${INCIDENT_AGENT_ENABLED:-true}
       AGENT_MODEL: ${INCIDENT_AGENT_MODEL:-}
+      # Let the agent apply its fix to app/. Set to "false" to only investigate.
+      AGENT_CAN_FIX: ${INCIDENT_AGENT_CAN_FIX:-true}
     volumes:
-      # The agent reads the source code but cannot change it.
+      # The agent reads the whole repo; only app/ is writable (for fixes).
       - .:/workspace:ro
+      - ./app:/workspace/app
       - ./incident-response/incidents:/incidents
     depends_on:
       - app

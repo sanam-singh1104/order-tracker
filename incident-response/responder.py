@@ -8,7 +8,8 @@ responder:
    endpoint), and Loki (error logs and the logs of those traces), and writes it
    to incidents/<id>/context.md plus the raw JSON responses,
 3. starts Claude Code in headless mode (`claude -p`) to investigate, and saves
-   its report to incidents/<id>/investigation.md.
+   its report to incidents/<id>/investigation.md. With AGENT_CAN_FIX=true the
+   agent may also edit files under app/, and the change is saved to fix.diff.
 
 Only the standard library is used. Configuration comes from environment
 variables (see the constants below).
@@ -44,11 +45,14 @@ MAX_TRACES = int(os.getenv("MAX_TRACES", "5"))
 AGENT_ENABLED = os.getenv("AGENT_ENABLED", "true").lower() != "false"
 AGENT_TIMEOUT_SECONDS = int(os.getenv("AGENT_TIMEOUT_SECONDS", "900"))
 AGENT_MODEL = os.getenv("AGENT_MODEL", "")
+AGENT_CAN_FIX = os.getenv("AGENT_CAN_FIX", "false").lower() == "true"
 HTTP_TIMEOUT = 10
 
-# The agent may read code and query the telemetry backends, nothing else.
-# dontAsk mode denies every tool that is not listed here.
+# The agent may read code and query the telemetry backends. dontAsk mode
+# denies every tool that is not listed here.
 AGENT_TOOLS = ["Read", "Grep", "Glob", "Bash(curl *)", "Bash(jq *)"]
+# In fix mode it may also edit the application code, and only that.
+FIX_TOOLS = ["Edit(./app/**)"]
 
 log = logging.getLogger("incident-responder")
 
@@ -297,7 +301,20 @@ def gather_context(alert, incident_dir, now=None):
 # Headless coding assistant
 
 
-def agent_prompt(incident_dir, endpoint):
+def agent_prompt(incident_dir, endpoint, can_fix=None):
+    can_fix = AGENT_CAN_FIX if can_fix is None else can_fix
+    if can_fix:
+        code_access = (
+            "The application code in app/ is writable: once you have found the root\n"
+            "cause, apply the smallest correct fix there with the Edit tool. Everything\n"
+            "else (tests, config, this incident folder) is read-only; do not try to\n"
+            "change it. The running app will not pick up your change until it is\n"
+            "rebuilt, so do not expect the live endpoint to recover."
+        )
+        fix_section = "Fix applied (file:line and what changed, as a unified diff)"
+    else:
+        code_access = "It is mounted read-only. Do not try to modify any files."
+        fix_section = "Suggested fix (as a unified diff)"
     return f"""\
 You are the on-call engineer for the Order Tracker service. Grafana fired an
 alert for HTTP 5xx errors on the endpoint `{endpoint}`.
@@ -305,8 +322,10 @@ alert for HTTP 5xx errors on the endpoint `{endpoint}`.
 The alert and the context collected when it fired are in {incident_dir}.
 Start with {incident_dir}/context.md; raw JSON is next to it.
 
-The service source code is in the current directory ({WORKSPACE_DIR}), mounted
-read-only. Do not try to modify any files. You may query live systems with curl:
+The service source code is in the current directory ({WORKSPACE_DIR}).
+{code_access}
+
+You may query live systems with curl:
 - App:        {APP_URL} (API under /api/orders, health at /healthz)
 - Loki:       {LOKI_URL} (LogQL, e.g. /loki/api/v1/query_range, stream {{service_name="{SERVICE_NAME}"}})
 - Tempo:      {TEMPO_URL} (TraceQL search at /api/search, traces at /api/traces/<id>)
@@ -315,17 +334,19 @@ read-only. Do not try to modify any files. You may query live systems with curl:
 Find the root cause. Reproduce it against the app with a read-only request if
 you can. Then reply with only a Markdown incident report with these sections:
 Summary, Impact, Timeline, Evidence (cite log lines and trace IDs), Root cause
-(with file:line), Suggested fix (as a unified diff), How to verify the fix.
+(with file:line), {fix_section}, How to verify the fix.
 """
 
 
-def agent_command():
+def agent_command(can_fix=None):
+    can_fix = AGENT_CAN_FIX if can_fix is None else can_fix
+    tools = AGENT_TOOLS + (FIX_TOOLS if can_fix else [])
     command = [
         "claude", "-p",
         "--output-format", "text",
         "--permission-mode", "dontAsk",
         "--no-session-persistence",
-        "--allowedTools", *AGENT_TOOLS,
+        "--allowedTools", *tools,
     ]
     if AGENT_MODEL:
         command += ["--model", AGENT_MODEL]
@@ -370,7 +391,25 @@ def run_agent(incident_dir, endpoint):
     elapsed = time.monotonic() - started
     if result.returncode != 0:
         return f"failed: claude exited with {result.returncode} after {elapsed:.0f}s (see agent.log)"
+    if AGENT_CAN_FIX:
+        changed = save_fix_diff(incident_dir)
+        return f"done in {elapsed:.0f}s, " + ("fix applied (see fix.diff)" if changed else "no code changed")
     return f"done in {elapsed:.0f}s"
+
+
+def save_fix_diff(incident_dir):
+    """Save uncommitted changes under app/ to fix.diff. Returns True if any."""
+    try:
+        result = subprocess.run(
+            # autocrlf matches Git for Windows, so CRLF checkouts diff cleanly.
+            ["git", "--no-optional-locks", "-c", "core.autocrlf=true", "diff", "--", "app"],
+            capture_output=True, text=True, encoding="utf-8", cwd=WORKSPACE_DIR, timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        log.warning("Could not compute fix diff: %s", exc)
+        return False
+    (incident_dir / "fix.diff").write_text(result.stdout, encoding="utf-8")
+    return bool(result.stdout.strip())
 
 
 # ---------------------------------------------------------------------------

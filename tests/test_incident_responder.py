@@ -107,4 +107,14 @@ def test_agent_runs_headless_with_read_only_tools(responder_module):
     assert command[:2] == ["claude", "-p"]
     assert command[command.index("--permission-mode") + 1] == "dontAsk"
     tools = command[command.index("--allowedTools") + 1:]
-    assert "Edit" not in tools and "Write" not in tools and "Bash" not in tools
+    assert not any(t.startswith(("Edit", "Write")) for t in tools) and "Bash" not in tools
+
+
+def test_fix_mode_allows_editing_app_code_only(responder_module, tmp_path):
+    command = responder_module.agent_command(can_fix=True)
+    prompt = responder_module.agent_prompt(tmp_path, "/api/orders/{order_id}", can_fix=True)
+
+    tools = command[command.index("--allowedTools") + 1:]
+    assert [t for t in tools if t.startswith(("Edit", "Write"))] == ["Edit(./app/**)"]
+    assert "Bash" not in tools
+    assert "apply the smallest correct fix" in prompt and "Fix applied" in prompt

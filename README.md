@@ -74,7 +74,7 @@ Check its state under **Alerting → Alert rules** in Grafana. `observability/gr
 
 1. Saves the alert in `incident-response/incidents/<time>-<alert>-<endpoint>/alert.json` and replies `202` right away.
 2. Collects context from inside the Compose network: app health (`http://app:8000/healthz`), failing traces on the alerted endpoint from Tempo (TraceQL `status = error && span.http.route = "<endpoint>"`, up to 5 full traces), and Loki logs for those traces plus all recent error logs. It writes a readable summary to `context.md`, next to the raw JSON.
-3. Starts Claude Code headless (`claude -p`) with the source mounted read-only at `/workspace`. The agent gets only `Read`, `Grep`, `Glob`, `curl`, and `jq` (permission mode `dontAsk` denies all other tools), so it can query the app, Loki, Tempo, and Prometheus but cannot change anything. Its report (summary, evidence, root cause, suggested diff) is saved to `investigation.md`, with stderr in `agent.log`.
+3. Starts Claude Code headless (`claude -p`) with the repo mounted at `/workspace`. The agent gets `Read`, `Grep`, `Glob`, `curl`, `jq`, and `Edit` limited to `app/**` (permission mode `dontAsk` denies all other tools). It queries the app, Loki, Tempo, and Prometheus, then applies a fix to `app/`, the only writable part of the mount. Its report (summary, evidence, root cause, applied fix) is saved to `investigation.md`, its change to `fix.diff`, and stderr to `agent.log`. The fix lands in your working tree as an uncommitted change, so review it with `git diff`. The running app picks it up only after a rebuild (`docker compose up -d --build app`). Set `INCIDENT_AGENT_CAN_FIX=false` to have the agent only investigate and suggest a diff.
 
 `status.json` in each folder shows progress (`received` → `collecting context` → `investigating` → `done`/`failed`). Resolved notifications and repeats of an alert that is already handled are skipped. One investigation runs at a time, with a 15 minute limit.
 
@@ -96,15 +96,37 @@ curl -X POST http://127.0.0.1:8001/alerts -H "Content-Type: application/json" --
 
 On Windows PowerShell, use `curl.exe` instead of `curl`. A repeat of the same alert is skipped until the responder restarts; change `fingerprint` or `startsAt` in the file to send it again.
 
-**Trigger a real incident**: request the express order placed at the end of last month, which fails with a 500:
+**Full automatic flow** (alert → webhook → agent fix → verify):
 
-```bash
-curl http://127.0.0.1:8000/api/orders/express-1002
-```
+1. Rebuild and start everything. The second command makes Grafana reload the alerting provisioning, which it reads only at startup:
 
-Within about a minute Grafana fires the alert, and a new folder shows up in `incident-response/incidents/`. Follow along with `docker compose logs -f incident-responder`.
+   ```bash
+   docker compose up --build -d --wait
+   docker compose up -d --force-recreate --wait grafana
+   ```
 
-Grafana reads alerting provisioning only at startup. If Grafana was already running, recreate it with `docker compose up -d --force-recreate grafana`.
+2. Make sure the alert is Normal under **Alerting → Alert rules**. It stays firing for 5 minutes after the last 5xx, and Grafana does not resend an alert that is still firing.
+3. Trigger the failure. The express order placed at the end of last month returns a 500:
+
+   ```bash
+   curl http://127.0.0.1:8000/api/orders/express-1002
+   ```
+
+4. Watch Grafana send the webhook. Within about 40 seconds (30s rule interval + 10s group wait), the rule turns Firing and the responder logs `POST /alerts ... 202`:
+
+   ```bash
+   docker compose logs -f incident-responder
+   ```
+
+5. Watch the agent. The log moves through `collecting context` → `investigating` → `done in Ns, fix applied (see fix.diff)`, usually within a minute. Then check `incident-response/incidents/<newest>/investigation.md`, `fix.diff`, and `git diff app`.
+6. Verify. Rebuild the app with the fix and repeat the request, which now returns 200 with an `estimated_delivery`:
+
+   ```bash
+   docker compose up -d --build --wait app
+   curl http://127.0.0.1:8000/api/orders/express-1002
+   ```
+
+The alert returns to Normal about 5 minutes later. Commit the fix if you keep it.
 
 OTLP export is on when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. Set `ORDER_TRACKER_CONSOLE_TELEMETRY=true` in `compose.yaml` to also print all signals to `docker compose logs app`. The tests turn both off.
 
