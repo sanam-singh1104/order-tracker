@@ -1,0 +1,84 @@
+{
+  "metrics": {
+    "completedJobs": 3,
+    "inspectedBytes": "7388100",
+    "totalJobs": 3
+  },
+  "traces": [
+    {
+      "durationMs": 152,
+      "rootServiceName": "order-tracker",
+      "rootTraceName": "GET /api/orders/{order_id}",
+      "serviceStats": {
+        "order-tracker": {
+          "errorCount": 2,
+          "spanCount": 2
+        }
+      },
+      "spanSet": {
+        "matched": 1,
+        "spans": [
+          {
+            "attributes": [
+              {
+                "key": "status",
+                "value": {
+                  "stringValue": "error"
+                }
+              },
+              {
+                "key": "service.name",
+                "value": {
+                  "stringValue": "order-tracker"
+                }
+              },
+              {
+                "key": "http.route",
+                "value": {
+                  "stringValue": "/api/orders/{order_id}"
+                }
+              }
+            ],
+            "durationNanos": "152377708",
+            "spanID": "8165783e5207deaf",
+            "startTimeUnixNano": "1791106561375741075"
+          }
+        ]
+      },
+      "spanSets": [
+        {
+          "matched": 1,
+          "spans": [
+            {
+              "attributes": [
+                {
+                  "key": "status",
+                  "value": {
+                    "stringValue": "error"
+                  }
+                },
+                {
+                  "key": "service.name",
+                  "value": {
+                    "stringValue": "order-tracker"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/api/orders/{order_id}"
+                  }
+                }
+              ],
+              "durationNanos": "152377708",
+              "spanID": "8165783e5207deaf",
+              "startTimeUnixNano": "1791106561375741075"
+            }
+          ]
+        }
+      ],
+      "startTimeUnixNano": "1791106561375741075",
+      "traceID": "353c5e6f77169c812db62f8c24bee14"
+    }
+  ]
+}

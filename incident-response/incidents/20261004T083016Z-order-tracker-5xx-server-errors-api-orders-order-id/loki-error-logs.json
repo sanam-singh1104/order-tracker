@@ -1,0 +1,317 @@
+{
+  "data": {
+    "result": [
+      {
+        "stream": {
+          "code_file_path": "/app/app/main.py",
+          "code_function_name": "get_order",
+          "code_line_number": "167",
+          "detected_level": "error",
+          "exception_message": "day is out of range for month",
+          "exception_stacktrace": "Traceback (most recent call last):\n  File \"/app/app/main.py\", line 165, in get_order\n    order = order_detail(row)\n            ^^^^^^^^^^^^^^^^^\n  File \"/app/app/main.py\", line 80, in order_detail\n    estimated_at = placed_at.replace(day=placed_at.day + 2)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: day is out of range for month\n",
+          "exception_type": "ValueError",
+          "flags": "3",
+          "observed_timestamp": "1791102223797768931",
+          "order_id": "express-1002",
+          "scope_name": "order-tracker",
+          "service_instance_id": "d07e2c7f-a35f-4fe2-9969-4e5d2a4de39e",
+          "service_name": "order-tracker",
+          "severity_number": "17",
+          "severity_text": "ERROR",
+          "span_id": "b87e99f727ba5af9",
+          "telemetry_sdk_language": "python",
+          "telemetry_sdk_name": "opentelemetry",
+          "telemetry_sdk_version": "1.45.0",
+          "trace_id": "74eb81ef80174d10cf686042a2dc5daf"
+        },
+        "values": [
+          [
+            "1791102223779837440",
+            "Order lookup failed"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "code_file_path": "/app/app/main.py",
+          "code_function_name": "get_order",
+          "code_line_number": "167",
+          "detected_level": "error",
+          "exception_message": "day is out of range for month",
+          "exception_stacktrace": "Traceback (most recent call last):\n  File \"/app/app/main.py\", line 165, in get_order\n    order = order_detail(row)\n            ^^^^^^^^^^^^^^^^^\n  File \"/app/app/main.py\", line 80, in order_detail\n    estimated_at = placed_at.replace(day=placed_at.day + 2)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: day is out of range for month\n",
+          "exception_type": "ValueError",
+          "flags": "3",
+          "observed_timestamp": "1791102224054362676",
+          "order_id": "express-1002",
+          "scope_name": "order-tracker",
+          "service_instance_id": "d07e2c7f-a35f-4fe2-9969-4e5d2a4de39e",
+          "service_name": "order-tracker",
+          "severity_number": "17",
+          "severity_text": "ERROR",
+          "span_id": "dd4c6a005e9249d0",
+          "telemetry_sdk_language": "python",
+          "telemetry_sdk_name": "opentelemetry",
+          "telemetry_sdk_version": "1.45.0",
+          "trace_id": "87b8cc6d2ef5805772b9bc00611012c1"
+        },
+        "values": [
+          [
+            "1791102224054229504",
+            "Order lookup failed"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "code_file_path": "/app/app/main.py",
+          "code_function_name": "get_order",
+          "code_line_number": "167",
+          "detected_level": "error",
+          "exception_message": "day is out of range for month",
+          "exception_stacktrace": "Traceback (most recent call last):\n  File \"/app/app/main.py\", line 165, in get_order\n    order = order_detail(row)\n            ^^^^^^^^^^^^^^^^^\n  File \"/app/app/main.py\", line 80, in order_detail\n    estimated_at = placed_at.replace(day=placed_at.day + 2)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: day is out of range for month\n",
+          "exception_type": "ValueError",
+          "flags": "3",
+          "observed_timestamp": "1791102224158610972",
+          "order_id": "express-1002",
+          "scope_name": "order-tracker",
+          "service_instance_id": "d07e2c7f-a35f-4fe2-9969-4e5d2a4de39e",
+          "service_name": "order-tracker",
+          "severity_number": "17",
+          "severity_text": "ERROR",
+          "span_id": "5ec4d2c829477513",
+          "telemetry_sdk_language": "python",
+          "telemetry_sdk_name": "opentelemetry",
+          "telemetry_sdk_version": "1.45.0",
+          "trace_id": "aa57080be42fe36b8ed1c5d8d535cef1"
+        },
+        "values": [
+          [
+            "1791102224158503936",
+            "Order lookup failed"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "code_file_path": "/app/app/main.py",
+          "code_function_name": "get_order",
+          "code_line_number": "167",
+          "detected_level": "error",
+          "exception_message": "day is out of range for month",
+          "exception_stacktrace": "Traceback (most recent call last):\n  File \"/app/app/main.py\", line 165, in get_order\n    order = order_detail(row)\n            ^^^^^^^^^^^^^^^^^\n  File \"/app/app/main.py\", line 80, in order_detail\n    estimated_at = placed_at.replace(day=placed_at.day + 2)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: day is out of range for month\n",
+          "exception_type": "ValueError",
+          "flags": "3",
+          "observed_timestamp": "1791102526849313865",
+          "order_id": "express-1002",
+          "scope_name": "order-tracker",
+          "service_instance_id": "d07e2c7f-a35f-4fe2-9969-4e5d2a4de39e",
+          "service_name": "order-tracker",
+          "severity_number": "17",
+          "severity_text": "ERROR",
+          "span_id": "1cd40df8e738dea6",
+          "telemetry_sdk_language": "python",
+          "telemetry_sdk_name": "opentelemetry",
+          "telemetry_sdk_version": "1.45.0",
+          "trace_id": "d1db5c95a620f3498dae12c977b2a6fe"
+        },
+        "values": [
+          [
+            "1791102526845941248",
+            "Order lookup failed"
+          ]
+        ]
+      }
+    ],
+    "resultType": "streams",
+    "stats": {
+      "cache": {
+        "chunk": {
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "downloadTime": 0,
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "queryLengthServed": 0,
+          "requests": 0
+        },
+        "index": {
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "downloadTime": 0,
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "queryLengthServed": 0,
+          "requests": 0
+        },
+        "instantMetricResult": {
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "downloadTime": 0,
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "queryLengthServed": 0,
+          "requests": 0
+        },
+        "labelResult": {
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "downloadTime": 0,
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "queryLengthServed": 0,
+          "requests": 0
+        },
+        "result": {
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "downloadTime": 0,
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "queryLengthServed": 0,
+          "requests": 0
+        },
+        "seriesResult": {
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "downloadTime": 0,
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "queryLengthServed": 0,
+          "requests": 0
+        },
+        "statsResult": {
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "downloadTime": 0,
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "queryLengthServed": 0,
+          "requests": 0
+        },
+        "volumeResult": {
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "downloadTime": 0,
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "queryLengthServed": 0,
+          "requests": 0
+        }
+      },
+      "index": {
+        "bloomFilterTime": 0,
+        "chunkRefsLookupTime": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "totalChunks": 0,
+        "totalStreams": 0,
+        "usedBloomFilters": false
+      },
+      "ingester": {
+        "recvWaitTime": 0.002701,
+        "store": {
+          "chunk": {
+            "compressedBytes": 0,
+            "decompressedBytes": 0,
+            "decompressedLines": 0,
+            "decompressedStructuredMetadataBytes": 0,
+            "headChunkBytes": 652,
+            "headChunkLines": 4,
+            "headChunkStructuredMetadataBytes": 576,
+            "postFilterLines": 4,
+            "totalDuplicates": 0
+          },
+          "chunkRefsFetchTime": 502365,
+          "chunksDownloadTime": 0,
+          "congestionControlLatency": 0,
+          "dataobj": {
+            "pageBatches": 0,
+            "pagesDownloaded": 0,
+            "pagesDownloadedBytes": 0,
+            "pagesScanned": 0,
+            "postFilterRows": 0,
+            "postPredicateDecompressedBytes": 0,
+            "postPredicateRows": 0,
+            "postPredicateStructuredMetadataBytes": 0,
+            "prePredicateDecompressedBytes": 0,
+            "prePredicateDecompressedRows": 0,
+            "prePredicateDecompressedStructuredMetadataBytes": 0,
+            "totalPageDownloadTime": 0,
+            "totalRowsAvailable": 0
+          },
+          "pipelineWrapperFilteredLines": 0,
+          "queryReferencedStructuredMetadata": true,
+          "queryUsedV2Engine": false,
+          "totalChunksDownloaded": 0,
+          "totalChunksRef": 0
+        },
+        "totalBatches": 2,
+        "totalChunksMatched": 1,
+        "totalLinesSent": 4,
+        "totalReached": 1
+      },
+      "querier": {
+        "querierExecTime": 0.016083,
+        "store": {
+          "chunk": {
+            "compressedBytes": 0,
+            "decompressedBytes": 0,
+            "decompressedLines": 0,
+            "decompressedStructuredMetadataBytes": 0,
+            "headChunkBytes": 0,
+            "headChunkLines": 0,
+            "headChunkStructuredMetadataBytes": 0,
+            "postFilterLines": 0,
+            "totalDuplicates": 0
+          },
+          "chunkRefsFetchTime": 0,
+          "chunksDownloadTime": 0,
+          "congestionControlLatency": 0,
+          "dataobj": {
+            "pageBatches": 0,
+            "pagesDownloaded": 0,
+            "pagesDownloadedBytes": 0,
+            "pagesScanned": 0,
+            "postFilterRows": 0,
+            "postPredicateDecompressedBytes": 0,
+            "postPredicateRows": 0,
+            "postPredicateStructuredMetadataBytes": 0,
+            "prePredicateDecompressedBytes": 0,
+            "prePredicateDecompressedRows": 0,
+            "prePredicateDecompressedStructuredMetadataBytes": 0,
+            "totalPageDownloadTime": 0,
+            "totalRowsAvailable": 0
+          },
+          "pipelineWrapperFilteredLines": 0,
+          "queryReferencedStructuredMetadata": false,
+          "queryUsedV2Engine": false,
+          "totalChunksDownloaded": 0,
+          "totalChunksRef": 0
+        }
+      },
+      "summary": {
+        "bytesProcessedPerSecond": 16615,
+        "execTime": 0.039241,
+        "linesProcessedPerSecond": 101,
+        "queueTime": 0.000362,
+        "shards": 1,
+        "splits": 0,
+        "subqueries": 0,
+        "totalBytesProcessed": 652,
+        "totalEntriesReturned": 4,
+        "totalLinesProcessed": 4,
+        "totalPostFilterLines": 4,
+        "totalStructuredMetadataBytesProcessed": 576
+      }
+    }
+  },
+  "status": "success"
+}

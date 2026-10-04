@@ -1,0 +1,13 @@
+{
+  "collection_errors": [],
+  "endpoint": "/api/orders/{order_id}",
+  "key": "d664258823d03ddf@2026-10-04T08:29:20Z",
+  "state": "failed: claude exited with 1 after 11s (see agent.log)",
+  "trace_ids": [
+    "d1db5c95a620f3498dae12c977b2a6fe",
+    "aa57080be42fe36b8ed1c5d8d535cef1",
+    "87b8cc6d2ef5805772b9bc00611012c1",
+    "74eb81ef80174d10cf686042a2dc5daf"
+  ],
+  "updated_at": "2026-10-04T08:29:52.107551+00:00"
+}

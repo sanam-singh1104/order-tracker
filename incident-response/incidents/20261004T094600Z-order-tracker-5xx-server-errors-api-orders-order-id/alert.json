@@ -1,0 +1,64 @@
+{
+  "annotations": {
+    "dashboard_url": "http://127.0.0.1:3000/d/order-tracker/order-tracker?from=now-1h&to=now",
+    "description": "8 server error(s) (HTTP 5xx) on /api/orders/{order_id} in the last 5 minutes.",
+    "endpoint": "/api/orders/{order_id}",
+    "summary": "HTTP 5xx errors on /api/orders/{order_id}",
+    "window": "5m"
+  },
+  "dashboardURL": "http://127.0.0.1:3000/d/order-tracker?from=1791103550000&orgId=1&to=1791107160141",
+  "endsAt": "0001-01-01T00:00:00Z",
+  "fingerprint": "d664258823d03ddf",
+  "generatorURL": "http://127.0.0.1:3000/alerting/grafana/order-tracker-5xx/view?orgId=1",
+  "labels": {
+    "alertname": "Order Tracker 5xx server errors",
+    "grafana_folder": "Order Tracker",
+    "http_route": "/api/orders/{order_id}",
+    "service": "order-tracker",
+    "severity": "critical"
+  },
+  "notification": {
+    "appVersion": "13.2.3",
+    "commonAnnotations": {
+      "dashboard_url": "http://127.0.0.1:3000/d/order-tracker/order-tracker?from=now-1h&to=now",
+      "description": "8 server error(s) (HTTP 5xx) on /api/orders/{order_id} in the last 5 minutes.",
+      "endpoint": "/api/orders/{order_id}",
+      "summary": "HTTP 5xx errors on /api/orders/{order_id}",
+      "window": "5m"
+    },
+    "commonLabels": {
+      "alertname": "Order Tracker 5xx server errors",
+      "grafana_folder": "Order Tracker",
+      "http_route": "/api/orders/{order_id}",
+      "service": "order-tracker",
+      "severity": "critical"
+    },
+    "externalURL": "http://127.0.0.1:3000/",
+    "groupKey": "{}:{alertname=\"Order Tracker 5xx server errors\", grafana_folder=\"Order Tracker\", http_route=\"/api/orders/{order_id}\"}",
+    "groupLabels": {
+      "alertname": "Order Tracker 5xx server errors",
+      "grafana_folder": "Order Tracker",
+      "http_route": "/api/orders/{order_id}"
+    },
+    "message": "**Firing**\n\nValue: A=7.599838481728247, B=7.599838481728247, C=1\nLabels:\n - alertname = Order Tracker 5xx server errors\n - grafana_folder = Order Tracker\n - http_route = /api/orders/{order_id}\n - service = order-tracker\n - severity = critical\nAnnotations:\n - dashboard_url = http://127.0.0.1:3000/d/order-tracker/order-tracker?from=now-1h&to=now\n - description = 8 server error(s) (HTTP 5xx) on /api/orders/{order_id} in the last 5 minutes.\n - endpoint = /api/orders/{order_id}\n - summary = HTTP 5xx errors on /api/orders/{order_id}\n - window = 5m\nSource: http://127.0.0.1:3000/alerting/grafana/order-tracker-5xx/view?orgId=1\nSilence: http://127.0.0.1:3000/alerting/silence/new?alertmanager=grafana&matcher=__alert_rule_uid__%3Dorder-tracker-5xx&matcher=http_route%3D%2Fapi%2Forders%2F%7Border_id%7D&matcher=service%3Dorder-tracker&matcher=severity%3Dcritical&orgId=1\nDashboard: http://127.0.0.1:3000/d/order-tracker?from=1791103550000&orgId=1&to=1791107160141\nPanel: http://127.0.0.1:3000/d/order-tracker?from=1791103550000&orgId=1&to=1791107160141&viewPanel=6\n",
+    "orgId": 1,
+    "receiver": "incident-responder",
+    "state": "alerting",
+    "status": "firing",
+    "title": "[FIRING:1] Order Tracker 5xx server errors Order Tracker /api/orders/{order_id} (order-tracker critical)",
+    "truncatedAlerts": 0,
+    "version": "1"
+  },
+  "orgId": 1,
+  "panelURL": "http://127.0.0.1:3000/d/order-tracker?from=1791103550000&orgId=1&to=1791107160141&viewPanel=6",
+  "ruleUID": "order-tracker-5xx",
+  "silenceURL": "http://127.0.0.1:3000/alerting/silence/new?alertmanager=grafana&matcher=__alert_rule_uid__%3Dorder-tracker-5xx&matcher=http_route%3D%2Fapi%2Forders%2F%7Border_id%7D&matcher=service%3Dorder-tracker&matcher=severity%3Dcritical&orgId=1",
+  "startsAt": "2026-10-04T09:45:50Z",
+  "status": "firing",
+  "valueString": "[ var='A' labels={http_route=/api/orders/{order_id}} type='query' value=7.599838481728247 ], [ var='B' labels={http_route=/api/orders/{order_id}} type='reduce' value=7.599838481728247 ], [ var='C' labels={http_route=/api/orders/{order_id}} type='threshold' value=1 ]",
+  "values": {
+    "A": 7.599838481728247,
+    "B": 7.599838481728247,
+    "C": 1
+  }
+}

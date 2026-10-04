@@ -1,0 +1,10 @@
+{
+  "collection_errors": [],
+  "endpoint": "/api/orders/{order_id}",
+  "key": "d664258823d03ddf@2026-10-04T09:36:20Z",
+  "state": "done in 28s, fix applied (see fix.diff)",
+  "trace_ids": [
+    "353c5e6f77169c812db62f8c24bee14"
+  ],
+  "updated_at": "2026-10-04T09:37:05.209436+00:00"
+}

@@ -1,0 +1,39 @@
+{
+  "annotations": {
+    "dashboard_url": "http://127.0.0.1:3000/d/order-tracker/order-tracker?from=now-1h&to=now",
+    "description": "1 server error(s) (HTTP 5xx) on /api/orders/{order_id} in the last 5 minutes.",
+    "endpoint": "/api/orders/{order_id}",
+    "summary": "HTTP 5xx errors on /api/orders/{order_id}",
+    "window": "5m"
+  },
+  "endsAt": "0001-01-01T00:00:00Z",
+  "fingerprint": "manual-test",
+  "generatorURL": "http://127.0.0.1:3000/alerting/grafana/order-tracker-5xx/view",
+  "labels": {
+    "alertname": "Order Tracker 5xx server errors",
+    "grafana_folder": "Order Tracker",
+    "http_route": "/api/orders/{order_id}",
+    "service": "order-tracker",
+    "severity": "critical"
+  },
+  "notification": {
+    "commonAnnotations": {},
+    "commonLabels": {
+      "service": "order-tracker"
+    },
+    "externalURL": "http://127.0.0.1:3000/",
+    "groupLabels": {
+      "alertname": "Order Tracker 5xx server errors"
+    },
+    "message": "Manual test alert",
+    "orgId": 1,
+    "receiver": "incident-responder",
+    "state": "alerting",
+    "status": "firing",
+    "title": "[FIRING:1] Order Tracker 5xx server errors",
+    "version": "1"
+  },
+  "startsAt": "2026-10-04T12:00:00Z",
+  "status": "firing",
+  "valueString": "[ var='B' labels={http_route=/api/orders/{order_id}} value=1 ]"
+}
