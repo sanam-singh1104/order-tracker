@@ -66,7 +66,45 @@ What the app emits:
 
 `observability/grafana/provisioning/alerting/order-tracker-alerts.yaml` provisions **Order Tracker 5xx server errors** (folder *Order Tracker*). Every 30s it computes 5xx responses per endpoint over the last 5 minutes and fires as soon as one endpoint has any. Each alert includes the endpoint, the 5-minute window, and a dashboard link. Endpoints that served traffic without errors report 0 (Normal), and no traffic at all is treated as OK, so quiet periods never show "No Data".
 
-Check its state under **Alerting → Alert rules** in Grafana. No contact point is configured yet, so firing alerts are visible in Grafana but not delivered anywhere.
+Check its state under **Alerting → Alert rules** in Grafana. `observability/grafana/provisioning/alerting/incident-responder.yaml` sends every firing alert to the incident responder through a webhook contact point (grouped per endpoint, 10s group wait, repeated every 4h while firing).
+
+### Incident responder
+
+`incident-response/` is a small service (stdlib Python plus the Claude Code CLI) that runs in Compose as `incident-responder` and listens on <http://127.0.0.1:8001> (`INCIDENT_RESPONDER_PORT`). When Grafana POSTs an alert to `/alerts`, it:
+
+1. Saves the alert in `incident-response/incidents/<time>-<alert>-<endpoint>/alert.json` and replies `202` right away.
+2. Collects context from inside the Compose network: app health (`http://app:8000/healthz`), failing traces on the alerted endpoint from Tempo (TraceQL `status = error && span.http.route = "<endpoint>"`, up to 5 full traces), and Loki logs for those traces plus all recent error logs. It writes a readable summary to `context.md`, next to the raw JSON.
+3. Starts Claude Code headless (`claude -p`) with the source mounted read-only at `/workspace`. The agent gets only `Read`, `Grep`, `Glob`, `curl`, and `jq` (permission mode `dontAsk` denies all other tools), so it can query the app, Loki, Tempo, and Prometheus but cannot change anything. Its report (summary, evidence, root cause, suggested diff) is saved to `investigation.md`, with stderr in `agent.log`.
+
+`status.json` in each folder shows progress (`received` → `collecting context` → `investigating` → `done`/`failed`). Resolved notifications and repeats of an alert that is already handled are skipped. One investigation runs at a time, with a 15 minute limit.
+
+Claude Code needs credentials. Put one of these in `.env` (gitignored) or your shell before starting:
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-...
+# or a Claude subscription token, created with `claude setup-token`:
+CLAUDE_CODE_OAUTH_TOKEN=...
+```
+
+Without credentials the responder still saves the alert and context, and the investigation fails with "Not logged in". Set `INCIDENT_AGENT_ENABLED=false` to skip the agent on purpose, and `INCIDENT_AGENT_MODEL` to pick a model.
+
+**Send a test alert** (a Grafana-style payload, no real errors needed):
+
+```bash
+curl -X POST http://127.0.0.1:8001/alerts -H "Content-Type: application/json" --data-binary @incident-response/sample-alert.json
+```
+
+On Windows PowerShell, use `curl.exe` instead of `curl`. A repeat of the same alert is skipped until the responder restarts; change `fingerprint` or `startsAt` in the file to send it again.
+
+**Trigger a real incident**: request the express order placed at the end of last month, which fails with a 500:
+
+```bash
+curl http://127.0.0.1:8000/api/orders/express-1002
+```
+
+Within about a minute Grafana fires the alert, and a new folder shows up in `incident-response/incidents/`. Follow along with `docker compose logs -f incident-responder`.
+
+Grafana reads alerting provisioning only at startup. If Grafana was already running, recreate it with `docker compose up -d --force-recreate grafana`.
 
 OTLP export is on when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. Set `ORDER_TRACKER_CONSOLE_TELEMETRY=true` in `compose.yaml` to also print all signals to `docker compose logs app`. The tests turn both off.
 

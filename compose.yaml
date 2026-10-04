@@ -74,6 +74,38 @@ services:
       - tempo:/var/tempo
     restart: unless-stopped
 
+  incident-responder:
+    image: order-tracker-incident-responder:${ORDER_TRACKER_TAG:-local}
+    build: ./incident-response
+    ports:
+      - "127.0.0.1:${INCIDENT_RESPONDER_PORT:-8001}:8001"
+    environment:
+      APP_URL: http://app:8000
+      LOKI_URL: http://loki:3100
+      TEMPO_URL: http://tempo:3200
+      PROMETHEUS_URL: http://prometheus:9090
+      # Claude Code credentials, read from your shell or .env. Set one:
+      # an API key, or a subscription token from `claude setup-token`.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:-}
+      # Set to "false" to only collect context, without running Claude Code.
+      AGENT_ENABLED: ${INCIDENT_AGENT_ENABLED:-true}
+      AGENT_MODEL: ${INCIDENT_AGENT_MODEL:-}
+    volumes:
+      # The agent reads the source code but cannot change it.
+      - .:/workspace:ro
+      - ./incident-response/incidents:/incidents
+    depends_on:
+      - app
+      - loki
+      - tempo
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:8001/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
   grafana:
     image: grafana/grafana:13.2.3
     ports:
@@ -99,6 +131,7 @@ services:
       - prometheus
       - loki
       - tempo
+      - incident-responder
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/api/health"]
